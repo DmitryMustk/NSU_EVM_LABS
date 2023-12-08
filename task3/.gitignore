@@ -1,0 +1,5 @@
+.clang-format
+.idea
+src/cmake-build-debug
+src/lab5/build
+src/lab6/build
