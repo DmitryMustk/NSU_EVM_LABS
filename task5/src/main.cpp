@@ -16,7 +16,7 @@
 
 #define MATRIX_SIZE 100
 #define ARR_SIZE_MULT 1.2
-#define ATTEMPTS_NUMBER 3
+#define ATTEMPTS_NUMBER 10
 
 void direct_fill(int32_t* arr, const size_t size){
     arr[size - 1] = 0;
@@ -40,21 +40,20 @@ void random_fill(int32_t* arr, const size_t size){
     std::mt19937 g(rd());
     std::shuffle(arr, arr + size, g);
 }
-void clock(size_t& time) {
-  size_t s;
+void clock(uint64_t& time) {
+  uint64_t s;
   asm("rdtsc\n" : "=a"(s));
   time = s;
   //  asm("rdtsc\n" : "=a"(time));
 }
 
-void assign(const int32_t* arr, const size_t size, size_t& start, size_t& end, const size_t k = 1){
-    size_t l = 0;
+void assign(const int32_t* arr, const size_t size, uint64_t& start, uint64_t& end, const size_t k = 1){
     clock(start);
-    for(size_t l = 0, i = 0; i < size * k; ++i){
+    size_t l = 0;
+    for(size_t i  = 0; i < size * k; ++i){
         l = arr[l];
     }
-    if(__rdtsc() - start)
-        clock(end);
+    clock(end);
     if(l == 1488)
         std::cout << "0/";
 }
@@ -103,27 +102,21 @@ void calculate_time(const std::string mode, const size_t N_min, const size_t N_m
             random_fill(arr, N);
         else
             throw std::runtime_error("ERROR! Rerun with -h to get help");
-        size_t min_time = __LONG_MAX__;
+        uint64_t min_time = __LONG_MAX__;
         preheat_processor();
         preheat_cache(mode, N);
         
         for(size_t i = 0; i < ATTEMPTS_NUMBER; ++i){
-            size_t start, end;
+            uint64_t start, end;
             assign(arr, N, start, end, k);
             min_time = std::min(end - start, min_time);
         }
-        output << min_time  << "\n";
+        output << N << " " << min_time / N / k  << "\n";
         delete[] arr;
         N *= ARR_SIZE_MULT;
     }
 }
 
-//TODO: Главный цикл обработки
-//TODO: Вывод справки
-//TODO: Замеры времени
-//TODO: Python скрипт для построения графика
-//TODO: Прочитать статью про кэши
-//TODO: Добавить ответы на контрольные вопросы в notes.txt
 int main(int argc, char** argv) {
     const size_t N_min = L1_BYTE_SIZE / sizeof(uint32_t) / 2;
     const size_t N_max  = L3_BYTE_SIZE / sizeof(uint32_t) * 2;
@@ -132,6 +125,6 @@ int main(int argc, char** argv) {
 
     srand(time(0));
 
-    calculate_time(std::string(argv[1]), N_min, N_max, 1);
+    calculate_time(std::string(argv[1]), N_min, N_max, 5);
     return 0;
 }
