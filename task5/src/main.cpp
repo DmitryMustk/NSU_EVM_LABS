@@ -118,8 +118,8 @@ void calculate_time(const std::string mode, const size_t N_min, const size_t N_m
 }
 
 int main(int argc, char** argv) {
-    const size_t N_min = L1_BYTE_SIZE / sizeof(uint32_t) / 2;
-    const size_t N_max  = L3_BYTE_SIZE / sizeof(uint32_t) * 2;
+    const size_t N_min = L1_BYTE_SIZE / sizeof(uint32_t) / 32;
+    const size_t N_max  = L3_BYTE_SIZE / sizeof(uint32_t) * 8;
     if(argc < 2)
         throw std::runtime_error("Use ./task5 MODE");
 
